@@ -23,7 +23,7 @@
     },
     "suggest": {
         "ext-curl":     "*",
-        "ext-openssl":  "*",
+        "ext-openssl":  "*"
     },
     "autoload": {
         "psr-0": { "DDG\\": "src/" }
