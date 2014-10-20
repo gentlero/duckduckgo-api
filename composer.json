@@ -1,0 +1,30 @@
+{
+    "name": "gentle/duckduckgo-api",
+    "type": "library",
+    "description": "PHP client for DuckDuckGo API",
+    "homepage": "https://github.com/gentlero/duckduckgo-api",
+    "keywords": ["duckduckgo", "api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandru Guzinschi",
+            "email": "alex@gentle.ro",
+            "homepage": "http://www.sebi.me",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php":                  ">=5.3",
+        "kriswallsmith/buzz":   "0.13"
+    },
+    "require-dev": {
+        "phpunit/phpunit":          "3.7.*",
+        "satooshi/php-coveralls":   "0.6.*"
+    },
+    "suggest": {
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-0": { "DDG\\": "src/" }
+    }
+}
