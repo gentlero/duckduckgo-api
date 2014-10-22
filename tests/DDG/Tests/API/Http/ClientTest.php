@@ -55,4 +55,43 @@ class ClientTest extends TestCase
 
         $this->assertInstanceOf('\Buzz\Message\MessageInterface', $response);
     }
+
+    public function testAddListener()
+    {
+        $listener = $this->getListenerMock();
+
+        $this->client->addListener($listener, 1);
+        $this->client->addListener($listener, 14);
+
+        $this->assertInstanceOf('DDG\API\Http\Listener\ListenerInterface', $this->client->getListener('dummy'));
+    }
+
+    public function testDeleteListener()
+    {
+        $listener = $this->getListenerMock('lorem');
+
+        $this->client->addListener($listener);
+        $this->assertTrue($this->client->isListener('lorem'));
+
+        $this->client->delListener($listener);
+
+        $this->assertFalse($this->client->isListener('lorem'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetAbsentListener()
+    {
+        $this->client->getListener('invalid');
+    }
+
+    private function getListenerMock($name = 'dummy')
+    {
+        $listener = $this->getMock('DDG\API\Http\Listener\ListenerInterface');
+
+        $listener->expects($this->any())->method('getName')->will($this->returnValue($name));
+
+        return $listener;
+    }
 }
