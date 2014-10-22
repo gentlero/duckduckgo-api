@@ -90,7 +90,7 @@ interface ClientInterface
      *
      * @access public
      * @param  string $format
-     * @return string
+     * @return $this
      *
      * @throws \InvalidArgumentException If invalid response format is provided
      */
