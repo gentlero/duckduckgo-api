@@ -101,8 +101,8 @@ class Client implements ClientInterface
         }
 
         if ($this->isListener($name) === true) {
-            foreach ($this->listeners as $collection) {
-                unset($collection[$name]);
+            foreach ($this->listeners as $prio => $collection) {
+                unset($this->listeners[$prio][$name]);
             }
         }
 
