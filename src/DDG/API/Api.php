@@ -76,4 +76,29 @@ class Api
     {
         return $this->getClient()->getResponseFormat();
     }
+
+    /**
+     * @access public
+     * @param  string $name
+     * @return $this
+     *
+     * @see https://duck.co/help/privacy/t
+     */
+    public function setAppName($name)
+    {
+        $this->getClient()->setOption('app_name', (string) $name);
+
+        return $this;
+    }
+
+    /**
+     * @access public
+     * @return string
+     *
+     * @see https://duck.co/help/privacy/t
+     */
+    public function getAppName()
+    {
+        return $this->getClient()->getOption('app_name');
+    }
 }
