@@ -22,7 +22,7 @@ use DDG\API\Http\Listener\ListenerInterface;
 /**
  * @author Alexandru Guzinschi <alex@gentle.ro>
  */
-class Client implements ClientInterface
+class Client extends ClientListener implements ClientInterface
 {
     /**
      * @var array
@@ -53,11 +53,6 @@ class Client implements ClientInterface
     private $lastResponse;
 
     /**
-     * @var ListenerInterface[]
-     */
-    protected $listeners = array();
-
-    /**
      * @var MessageInterface
      */
     protected $responseObj;
@@ -74,59 +69,6 @@ class Client implements ClientInterface
 
         $this->transport->setTimeout($this->options['timeout']);
         $this->transport->setVerifyPeer($this->options['verify_peer']);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addListener(ListenerInterface $listener, $priority = 0)
-    {
-        // Don't allow same listener with different priorities.
-        if ($this->isListener($listener->getName())) {
-            $this->delListener($listener->getName());
-        }
-
-        $this->listeners[$priority][$listener->getName()] = $listener;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function delListener($name)
-    {
-        if ($name instanceof ListenerInterface) {
-            $name = $name->getName();
-        }
-
-        if ($this->isListener($name) === true) {
-            foreach ($this->listeners as $prio => $collection) {
-                unset($this->listeners[$prio][$name]);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getListener($name)
-    {
-        if (!$listener = $this->searchListener($name)) {
-            throw new \InvalidArgumentException(sprintf('Unknown listener %s', $name));
-        }
-
-        return $listener;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isListener($name)
-    {
-        return ($this->searchListener($name) instanceof ListenerInterface);
     }
 
     /**
@@ -171,30 +113,8 @@ class Client implements ClientInterface
      */
     public function request($endpoint, $params = array(), $method = 'GET', array $headers = array())
     {
-        $request = $this->createRequest($method, $endpoint);
-
-        // add a default content-type if none was set
-        if (in_array(strtoupper($method), array('POST', 'PUT')) && empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        }
-
-        /**
-         * Add app name if was not already been set
-         * @see https://duck.co/help/privacy/t
-         */
-        if (!isset($params['t'])) {
-            $params['t'] = $this->getOption('app_name');
-        }
-
-        if (!empty($headers)) {
-            $request->addHeaders($headers);
-        }
-
-        if (!empty($params)) {
-            $request->setContent(is_array($params) ? http_build_query($params) : $params);
-        }
-
-        $response = is_object($this->responseObj) ? $this->responseObj : new Response;
+        $request    = $this->setRequestData($params, $method, $headers, $this->createRequest($method, $endpoint));
+        $response   = is_object($this->responseObj) ? $this->responseObj : new Response;
 
         $this->executeListeners($request, 'preSend');
 
@@ -333,6 +253,40 @@ class Client implements ClientInterface
     }
 
     /**
+     * @access protected
+     * @param  array            $params
+     * @param  string           $method
+     * @param  array            $headers
+     * @param  RequestInterface $request
+     * @return RequestInterface
+     */
+    protected function setRequestData($params, $method, array $headers, RequestInterface $request)
+    {
+        // add a default content-type if none was set
+        if (in_array(strtoupper($method), array('POST', 'PUT')) && empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+
+        /**
+         * Add app name if was not already been set
+         * @see https://duck.co/help/privacy/t
+         */
+        if (!isset($params['t'])) {
+            $params['t'] = $this->getOption('app_name');
+        }
+
+        if (!empty($headers)) {
+            $request->addHeaders($headers);
+        }
+
+        if (!empty($params)) {
+            $request->setContent(is_array($params) ? http_build_query($params) : $params);
+        }
+
+        return $request;
+    }
+
+    /**
      * Execute all available listeners
      *
      * $when can be: preSend or postSend
@@ -344,9 +298,7 @@ class Client implements ClientInterface
      */
     protected function executeListeners(RequestInterface $request, $when = 'preSend', MessageInterface $response = null)
     {
-        $haveListeners  = count($this->listeners) > 0;
-
-        if (!$haveListeners) {
+        if (false === $this->hasListeners()) {
             return;
         }
 
@@ -366,21 +318,5 @@ class Client implements ClientInterface
                 }
             }
         );
-    }
-
-    /**
-     * @access protected
-     * @param  string                 $name Listener name
-     * @return ListenerInterface|bool false on error
-     */
-    protected function searchListener($name)
-    {
-        foreach ($this->listeners as $collection) {
-            if (isset($collection[$name])) {
-                return $collection[$name];
-            }
-        }
-
-        return false;
     }
 }

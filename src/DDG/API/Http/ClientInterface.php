@@ -12,12 +12,11 @@
 namespace DDG\API\Http;
 
 use Buzz\Message\MessageInterface;
-use DDG\API\Http\Listener\ListenerInterface;
 
 /**
  * @author Alexandru Guzinschi <alex@gentle.ro>
  */
-interface ClientInterface
+interface ClientInterface extends ClientListenerInterface
 {
     /**
      * Make an HTTP GET request to API
@@ -95,39 +94,6 @@ interface ClientInterface
      * @throws \InvalidArgumentException If invalid response format is provided
      */
     public function setResponseFormat($format);
-
-    /**
-     * @access public
-     * @param  ListenerInterface $listener
-     * @return $this
-     */
-    public function addListener(ListenerInterface $listener);
-
-    /**
-     * @access public
-     * @param  ListenerInterface|string $name
-     * @return $this
-     */
-    public function delListener($name);
-
-    /**
-     * Get listener interface
-     *
-     * @param  string            $name
-     * @return ListenerInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function getListener($name);
-
-    /**
-     * Check if a listener exists
-     *
-     * @access public
-     * @param  string $name
-     * @return bool
-     */
-    public function isListener($name);
 
     /**
      * @access public
