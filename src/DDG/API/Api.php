@@ -101,4 +101,31 @@ class Api
     {
         return $this->getClient()->getOption('app_name');
     }
+
+    /**
+     * @access public
+     * @param  string $name
+     * @return Api
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function api($name)
+    {
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Not child specified.');
+        }
+
+        /** @var Api $child */
+        $name   = ucfirst(strtolower($name));
+        $class  = '\\DDG\\API\\'.$name;
+        $child  = new $class();
+
+        $child->setClient($this->getClient());
+
+        if ($this->getClient()->hasListeners()) {
+            $child->getClient()->setListeners($this->getClient()->getListeners());
+        }
+
+        return $child;
+    }
 }
