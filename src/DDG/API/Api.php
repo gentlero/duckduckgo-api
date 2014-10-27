@@ -107,17 +107,22 @@ class Api
      * @param  string $name
      * @return Api
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If $name is empty
+     * @throws \Exception                If child class does not exist.
      */
     public function api($name)
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('Not child specified.');
+            throw new \InvalidArgumentException('No child specified.');
         }
 
         /** @var Api $child */
-        $name   = ucfirst(strtolower($name));
         $class  = '\\DDG\\API\\'.$name;
+
+        if (!class_exists($class)) {
+            throw new \Exception(sprintf('Class %s does not exist.', $class));
+        }
+
         $child  = new $class();
 
         $child->setClient($this->getClient());

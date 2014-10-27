@@ -26,4 +26,50 @@ class ApiTest extends TestCase
 
         $api->setFormat('invalid');
     }
+
+    public function testApplicationName()
+    {
+        $api = new Api();
+
+        $api->setAppName('super');
+
+        $this->assertEquals('super', $api->getAppName());
+    }
+
+    public function testSingleEntryPoint()
+    {
+        /** @var \DDG\API\Topic $topic */
+        $ddg        = new Api();
+        $listener   = $this->getMock('DDG\API\Http\Listener\ListenerInterface');
+
+        $listener->expects($this->any())->method('getName')->will($this->returnValue('dummy'));
+
+        // listener should be forwarded to any child
+        $ddg->getClient()->addListener($listener);
+
+        $topic = $ddg->api('Topic');
+
+        $this->assertInstanceOf('\DDG\API\Topic', $topic);
+        $this->assertTrue($ddg->getClient()->isListener('dummy'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSingleEntryPointWithEmptyChild()
+    {
+        $ddg = new Api();
+
+        $ddg->api('');
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSingleEntryPointWithInvalidChild()
+    {
+        $ddg = new Api();
+
+        $ddg->api('inexistent');
+    }
 }
