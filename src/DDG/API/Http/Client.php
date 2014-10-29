@@ -34,7 +34,7 @@ class Client extends ClientListener implements ClientInterface
         'user_agent'    => 'duckduckgo-api-php/0.1.0 (https://github.com/gentlero/duckduckgo-api)',
         'app_name'      => 'my app',
         'timeout'       => 10,
-        'verify_peer'   => false
+        'verify_peer'   => true
     );
 
     /**
