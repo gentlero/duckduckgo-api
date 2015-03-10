@@ -2,6 +2,7 @@
 
 namespace DDG\Tests\API\Http;
 
+use Buzz\Message\Request;
 use DDG\Tests\API\TestCase;
 use DDG\API\Http\Client;
 
@@ -54,6 +55,7 @@ class ClientTest extends TestCase
         $response   = $client->request($endpoint, $params, 'POST', $headers);
 
         $this->assertInstanceOf('\Buzz\Message\MessageInterface', $response);
+        $this->assertEquals('q=dummy&t=my+app', $client->getLastRequest()->getContent());
     }
 
     public function testAddListener()
@@ -84,6 +86,27 @@ class ClientTest extends TestCase
     public function testGetAbsentListener()
     {
         $this->client->getListener('invalid');
+    }
+
+    public function testSetCustomRequest()
+    {
+        $endpoint   = '/';
+        $params     = array('q' => 'dummy');
+        $headers    = array('X-Test: yes');
+        $client     = new Client(
+            array(),
+            $this->getMock('\Buzz\Client\ClientInterface', array('setTimeout', 'setVerifyPeer', 'send'))
+        );
+
+        $request = new Request('GET', $endpoint);
+        $request->addHeaders($headers);
+        $client->setRequest($request);
+
+        $response = $client->get($endpoint, $params);
+        $request = $client->getLastRequest();
+
+        $this->assertEquals('yes', $request->getHeader('X-Test'));
+        $this->assertInstanceOf('\Buzz\Message\Response', $response);
     }
 
     private function getListenerMock($name = 'dummy')
