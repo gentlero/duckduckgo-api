@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5b531e966b4f6e0387959c9eee35853d",
+    "hash": "168db00d4b2294265abc62082d711c2c",
     "packages": [
         {
             "name": "kriswallsmith/buzz",
@@ -479,5 +479,9 @@
         "php": ">=5.3",
         "ext-openssl": "*"
     },
-    "platform-dev": []
+    "platform-dev": {
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*"
+    }
 }
