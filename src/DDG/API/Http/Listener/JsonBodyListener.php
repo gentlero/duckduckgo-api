@@ -33,7 +33,7 @@ class JsonBodyListener implements ListenerInterface
      */
     public function postSend(RequestInterface $request, MessageInterface $response)
     {
-        if (mb_strlen($response->getContent()) > 0) {
+        if (mb_strpos($response->getHeader('Content-Type'), 'application/x-javascript') !== false) {
             $data = json_decode($response->getContent());
 
             if (JSON_ERROR_NONE === json_last_error()) {
