@@ -1,9 +1,10 @@
 # PHP client for DuckDuckGo API
-[![Build Status](http://img.shields.io/travis/gentlero/duckduckgo-api/develop.svg)](https://travis-ci.org/gentlero/duckduckgo-api)
-[![Coverage Status](https://img.shields.io/coveralls/gentlero/duckduckgo-api/develop.svg)](https://coveralls.io/r/gentlero/duckduckgo-api?branch=develop)
-[![Packagist](http://img.shields.io/packagist/v/gentle/duckduckgo-api.svg)](https://packagist.org/packages/gentle/duckduckgo-api)
+
+[![Latest Version](https://img.shields.io/packagist/v/gentle/duckduckgo-api.svg?style=flat-square)](https://packagist.org/packages/gentle/duckduckgo-api)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/gentlero/duckduckgo-api/blob/master/LICENSE)
+[![Build Status](http://img.shields.io/travis/gentlero/duckduckgo-api/master.svg?style=flat-square)](https://travis-ci.org/gentlero/duckduckgo-api)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/gentlero/duckduckgo-api.svg?style=flat-square)](https://scrutinizer-ci.com/g/gentlero/duckduckgo-api/code-structure)
 [![Code quality](http://img.shields.io/scrutinizer/g/gentlero/duckduckgo-api/develop.svg)](https://scrutinizer-ci.com/g/gentlero/duckduckgo-api/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/gentlero/duckduckgo-api/blob/master/LICENSE)
 
 This is a PHP library which offers support to access [DuckDuckGo] API.
 
