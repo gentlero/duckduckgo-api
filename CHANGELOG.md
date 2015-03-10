@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
   - Added helper methods for setting/getting application name.
   - Simplified ClientInterface.
   - Added Api::api() as a single entry point.
+  - `verify_peer` option for HTTP transport client is now enabled by default.
+  - Added JsonBodyListener which can be used to decode json response.
   - More tests
 
 ## 0.1.0 / 2014-10-20
