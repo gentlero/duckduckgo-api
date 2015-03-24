@@ -36,6 +36,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         $response = new Response();
 
+        $response->addHeader('Content-Type: application/x-javascript');
         $response->setContent(json_encode($data));
 
         return $response;
