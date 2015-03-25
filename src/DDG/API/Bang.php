@@ -21,11 +21,12 @@ class Bang extends Api
     /**
      * @access public
      * @param  string           $query
+     * @param  array            $params
      * @return MessageInterface
      *
      * @throws \Exception
      */
-    public function get($query)
+    public function get($query, array $params = array())
     {
         if ($query[0] != '!') {
             $query = '!'.$query;
@@ -33,6 +34,6 @@ class Bang extends Api
 
         $this->getClient()->getTransport()->setMaxRedirects(0);
 
-        return $this->getClient()->get('/', array('q' => $query));
+        return $this->getClient()->get('/', array_merge(array('q' => $query), $params));
     }
 }
