@@ -271,7 +271,7 @@ class Client extends ClientListener implements ClientInterface
             $params = http_build_query($this->buildQueryData($params));
         }
 
-        if (strpos($params, 'format=') !== 'json' && (
+        if (strpos($params, 'format=json') === false && (
             (strpos($params, 'callback=') !== false) || strpos($params, 'pretty=') !== false)
         ) {
             throw new \InvalidArgumentException("'callback' and 'pretty' options can be used only with JSON format");
