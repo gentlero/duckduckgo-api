@@ -55,7 +55,7 @@ class ClientTest extends TestCase
         $response   = $client->request($endpoint, $params, 'POST', $headers);
 
         $this->assertInstanceOf('\Buzz\Message\MessageInterface', $response);
-        $this->assertEquals('q=dummy&t=my+app', $client->getLastRequest()->getContent());
+        $this->assertEquals('q=dummy&t=my+app&format=json', $client->getLastRequest()->getContent());
     }
 
     public function testAddListener()
