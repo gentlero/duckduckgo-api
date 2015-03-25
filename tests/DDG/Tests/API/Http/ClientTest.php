@@ -52,10 +52,24 @@ class ClientTest extends TestCase
         $headers    = array('1' => '2');
         $baseClient = $this->getBrowserMock();
         $client     = new Client(array(), $baseClient);
-        $response   = $client->request($endpoint, $params, 'POST', $headers);
+        $response   = $client->request($endpoint, $params, 'GET', $headers);
 
         $this->assertInstanceOf('\Buzz\Message\MessageInterface', $response);
-        $this->assertEquals('q=dummy&t=my+app&format=json', $client->getLastRequest()->getContent());
+        $this->assertEquals('/?q=dummy&t=my+app&format=json', $client->getLastRequest()->getResource());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCallbackOptionShouldBeAllowedOnlyForJson()
+    {
+        $endpoint   = '/';
+        $params     = array('q' => 'dummy', 'format' => 'xml', 'callback' => 'bla');
+        $headers    = array('1' => '2');
+        $baseClient = $this->getBrowserMock();
+        $client     = new Client(array(), $baseClient);
+
+        $client->request($endpoint, $params, 'GET', $headers);
     }
 
     public function testAddListener()
