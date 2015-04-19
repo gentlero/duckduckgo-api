@@ -27,7 +27,7 @@ interface ClientInterface extends ClientListenerInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function get($endpoint, $params = array(), $headers = array());
+    public function get($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make an HTTP POST request to API
@@ -38,7 +38,7 @@ interface ClientInterface extends ClientListenerInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function post($endpoint, $params = array(), $headers = array());
+    public function post($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make an HTTP PUT request to API
@@ -49,7 +49,7 @@ interface ClientInterface extends ClientListenerInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function put($endpoint, $params = array(), $headers = array());
+    public function put($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make a HTTP DELETE request to API
@@ -60,7 +60,7 @@ interface ClientInterface extends ClientListenerInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function delete($endpoint, $params = array(), $headers = array());
+    public function delete($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make a HTTP request
