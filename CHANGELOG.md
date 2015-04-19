@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] / [unreleased]
 
 ### Fixed:
+  - Bug fix: Listener propagation to child classes.
   - Bug fix: `Http\Client::delListener()` now actually deletes the listener
 
 ### Changed:
