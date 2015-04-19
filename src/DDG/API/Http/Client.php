@@ -74,7 +74,7 @@ class Client extends ClientListener implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function get($endpoint, $params = array(), $headers = array())
+    public function get($endpoint, $params = array(), array $headers = array())
     {
         if (is_array($params) && count($params) > 0) {
             $endpoint   .= (strpos($endpoint, '?') === false ? '?' : '&').http_build_query($params, '', '&');
@@ -86,7 +86,7 @@ class Client extends ClientListener implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function post($endpoint, $params = array(), $headers = array())
+    public function post($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'POST', $headers);
     }
@@ -94,7 +94,7 @@ class Client extends ClientListener implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function put($endpoint, $params = array(), $headers = array())
+    public function put($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'PUT', $headers);
     }
@@ -102,7 +102,7 @@ class Client extends ClientListener implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function delete($endpoint, $params = array(), $headers = array())
+    public function delete($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'DELETE', $headers);
     }
