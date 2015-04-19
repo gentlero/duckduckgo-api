@@ -76,4 +76,61 @@ class Api
     {
         return $this->getClient()->getResponseFormat();
     }
+
+    /**
+     * @access public
+     * @param  string $name
+     * @return $this
+     *
+     * @see https://duck.co/help/privacy/t
+     */
+    public function setAppName($name)
+    {
+        $this->getClient()->setOption('app_name', (string) $name);
+
+        return $this;
+    }
+
+    /**
+     * @access public
+     * @return string
+     *
+     * @see https://duck.co/help/privacy/t
+     */
+    public function getAppName()
+    {
+        return $this->getClient()->getOption('app_name');
+    }
+
+    /**
+     * @access public
+     * @param  string $name
+     * @return Api
+     *
+     * @throws \InvalidArgumentException If $name is empty
+     * @throws \Exception                If child class does not exist.
+     */
+    public function api($name)
+    {
+        if (empty($name)) {
+            throw new \InvalidArgumentException('No child specified.');
+        }
+
+        /** @var Api $child */
+        $class  = '\\DDG\\API\\'.$name;
+
+        if (!class_exists($class)) {
+            throw new \Exception(sprintf('Class %s does not exist.', $class));
+        }
+
+        $child  = new $class();
+
+        $child->setClient($this->getClient());
+
+        if ($this->getClient()->hasListeners()) {
+            $child->getClient()->setListeners($this->getClient()->getListeners());
+        }
+
+        return $child;
+    }
 }

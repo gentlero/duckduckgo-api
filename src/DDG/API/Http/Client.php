@@ -22,7 +22,7 @@ use DDG\API\Http\Listener\ListenerInterface;
 /**
  * @author Alexandru Guzinschi <alex@gentle.ro>
  */
-class Client implements ClientInterface
+class Client extends ClientListener implements ClientInterface
 {
     /**
      * @var array
@@ -31,10 +31,10 @@ class Client implements ClientInterface
         'base_url'      => 'https://api.duckduckgo.com',
         'format'        => 'json',
         'formats'       => array('json', 'xml'),    // supported response formats
-        'user_agent'    => 'duckduckgo-api-php/0.1.0 (https://github.com/gentlero/duckduckgo-api)',
+        'user_agent'    => 'duckduckgo-api-php/0.2.0 (https://github.com/gentlero/duckduckgo-api)',
         'app_name'      => 'my app',
         'timeout'       => 10,
-        'verify_peer'   => false
+        'verify_peer'   => true
     );
 
     /**
@@ -53,11 +53,6 @@ class Client implements ClientInterface
     private $lastResponse;
 
     /**
-     * @var ListenerInterface[]
-     */
-    protected $listeners = array();
-
-    /**
      * @var MessageInterface
      */
     protected $responseObj;
@@ -69,7 +64,7 @@ class Client implements ClientInterface
 
     public function __construct(array $options = array(), BuzzClientInterface $client = null)
     {
-        $this->transport    = (is_null($client)) ? new Curl : $client;
+        $this->transport    = (is_null($client)) ? new Curl() : $client;
         $this->options      = array_merge($this->options, $options);
 
         $this->transport->setTimeout($this->options['timeout']);
@@ -79,64 +74,10 @@ class Client implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function addListener(ListenerInterface $listener, $priority = 0)
-    {
-        // Don't allow same listener with different priorities.
-        if ($this->isListener($listener->getName())) {
-            $this->delListener($listener->getName());
-        }
-
-        $this->listeners[$priority][$listener->getName()] = $listener;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function delListener($name)
-    {
-        if ($name instanceof ListenerInterface) {
-            $name = $name->getName();
-        }
-
-        if ($this->isListener($name) === true) {
-            foreach ($this->listeners as $collection) {
-                unset($collection[$name]);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getListener($name)
-    {
-        if (!$listener = $this->searchListener($name)) {
-            throw new \InvalidArgumentException(sprintf('Unknown listener %s', $name));
-        }
-
-        return $listener;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isListener($name)
-    {
-        return ($this->searchListener($name) instanceof ListenerInterface);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function get($endpoint, $params = array(), $headers = array())
+    public function get($endpoint, $params = array(), array $headers = array())
     {
         if (is_array($params) && count($params) > 0) {
             $endpoint   .= (strpos($endpoint, '?') === false ? '?' : '&').http_build_query($params, '', '&');
-            $params     = array();
         }
 
         return $this->request($endpoint, $params, 'GET', $headers);
@@ -145,7 +86,7 @@ class Client implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function post($endpoint, $params = array(), $headers = array())
+    public function post($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'POST', $headers);
     }
@@ -153,7 +94,7 @@ class Client implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function put($endpoint, $params = array(), $headers = array())
+    public function put($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'PUT', $headers);
     }
@@ -161,7 +102,7 @@ class Client implements ClientInterface
     /**
      * {@inheritDoc}
      */
-    public function delete($endpoint, $params = array(), $headers = array())
+    public function delete($endpoint, $params = array(), array $headers = array())
     {
         return $this->request($endpoint, $params, 'DELETE', $headers);
     }
@@ -171,30 +112,8 @@ class Client implements ClientInterface
      */
     public function request($endpoint, $params = array(), $method = 'GET', array $headers = array())
     {
-        $request = $this->createRequest($method, $endpoint);
-
-        // add a default content-type if none was set
-        if (in_array(strtoupper($method), array('POST', 'PUT')) && empty($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        }
-
-        /**
-         * Add app name if was not already been set
-         * @see https://duck.co/help/privacy/t
-         */
-        if (!isset($params['t'])) {
-            $params['t'] = $this->getOption('app_name');
-        }
-
-        if (!empty($headers)) {
-            $request->addHeaders($headers);
-        }
-
-        if (!empty($params)) {
-            $request->setContent(is_array($params) ? http_build_query($params) : $params);
-        }
-
-        $response = is_object($this->responseObj) ? $this->responseObj : new Response;
+        $request    = $this->setRequestData($params, $method, $headers, $this->createRequest($method, $endpoint));
+        $response   = is_object($this->responseObj) ? $this->responseObj : new Response();
 
         $this->executeListeners($request, 'preSend');
 
@@ -230,7 +149,7 @@ class Client implements ClientInterface
      */
     public function setResponseFormat($format)
     {
-        if (!in_array($format, $this->options['formats'])) {
+        if (!in_array($format, $this->options['formats'], true)) {
             throw new \InvalidArgumentException(sprintf('Unsupported response format %s', $format));
         }
 
@@ -300,7 +219,7 @@ class Client implements ClientInterface
      */
     public function getOption($name)
     {
-        return isset($this->options[$name]) ? $this->options[$name] : null;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
     }
 
     /**
@@ -316,11 +235,6 @@ class Client implements ClientInterface
             $url = $this->getApiBaseUrl().'/'.ltrim($url, '/');
         }
 
-        // change the response format
-        if (strpos($url, 'format=') === false) {
-            $url .= (strpos($url, '?') === false ? '?' : '&').'format='.$this->getResponseFormat();
-        }
-
         $request = is_object($this->requestObj) ? $this->requestObj : new Request();
         $request->setMethod($method);
         $request->addHeaders(array(
@@ -333,20 +247,83 @@ class Client implements ClientInterface
     }
 
     /**
+     * @access protected
+     * @param  string|array     $params
+     * @param  string           $method
+     * @param  array            $headers
+     * @param  RequestInterface $request
+     * @return RequestInterface
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function setRequestData($params, $method, array $headers, RequestInterface $request)
+    {
+        // add a default content-type if none was set
+        if (in_array(strtoupper($method), array('POST', 'PUT'), true) && empty($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+
+        if (count($headers) > 0) {
+            $request->addHeaders($headers);
+        }
+
+        if (is_array($params)) {
+            $params = http_build_query($this->buildQueryData($params));
+        }
+
+        if (strpos($params, 'format=json') === false && (
+            (strpos($params, 'callback=') !== false) || strpos($params, 'pretty=') !== false)
+        ) {
+            throw new \InvalidArgumentException("'callback' and 'pretty' options can be used only with JSON format");
+        }
+
+        if ('GET' === $method) {
+            $request->setResource('/?'.$params);
+        } else {
+            $request->setContent($params);
+        }
+
+        return $request;
+    }
+
+    /**
+     * Append mandatory parameters to the query
+     *
+     * @access public
+     * @param  array $params
+     * @return array
+     */
+    protected function buildQueryData(array $params)
+    {
+        /**
+         * Add app name if was not already been set
+         * @see https://duck.co/help/privacy/t
+         */
+        if (!array_key_exists('t', $params)) {
+            $params['t'] = $this->getOption('app_name');
+        }
+
+        if (!array_key_exists('format', $params)) {
+            $params['format'] = $this->getResponseFormat();
+        }
+
+        return $params;
+    }
+
+    /**
      * Execute all available listeners
      *
      * $when can be: preSend or postSend
      *
      * @access protected
-     * @param RequestInterface $request
-     * @param string           $when     When to execute the listener
-     * @param MessageInterface $response
+     * @param  RequestInterface $request
+     * @param  string           $when     When to execute the listener
+     * @param  MessageInterface $response
+     * @return void
      */
     protected function executeListeners(RequestInterface $request, $when = 'preSend', MessageInterface $response = null)
     {
-        $haveListeners  = count($this->listeners) > 0;
-
-        if (!$haveListeners) {
+        if (false === $this->hasListeners()) {
             return;
         }
 
@@ -366,21 +343,5 @@ class Client implements ClientInterface
                 }
             }
         );
-    }
-
-    /**
-     * @access protected
-     * @param  string                 $name Listener name
-     * @return ListenerInterface|bool false on error
-     */
-    protected function searchListener($name)
-    {
-        foreach ($this->listeners as $collection) {
-            if (isset($collection[$name])) {
-                return $collection[$name];
-            }
-        }
-
-        return false;
     }
 }

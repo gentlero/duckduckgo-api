@@ -21,7 +21,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $client = $this->getBrowserMock();
 
         $client->expects($this->any())->method('setTimeout')->with(10);
-        $client->expects($this->any())->method('setVerifyPeer')->with(false);
+        $client->expects($this->any())->method('setVerifyPeer')->with(true);
         $client->expects($this->any())->method('send');
 
         return $client;
@@ -36,6 +36,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         $response = new Response();
 
+        $response->addHeader('Content-Type: application/x-javascript');
         $response->setContent(json_encode($data));
 
         return $response;

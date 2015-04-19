@@ -12,12 +12,11 @@
 namespace DDG\API\Http;
 
 use Buzz\Message\MessageInterface;
-use DDG\API\Http\Listener\ListenerInterface;
 
 /**
  * @author Alexandru Guzinschi <alex@gentle.ro>
  */
-interface ClientInterface
+interface ClientInterface extends ClientListenerInterface
 {
     /**
      * Make an HTTP GET request to API
@@ -28,7 +27,7 @@ interface ClientInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function get($endpoint, $params = array(), $headers = array());
+    public function get($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make an HTTP POST request to API
@@ -39,7 +38,7 @@ interface ClientInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function post($endpoint, $params = array(), $headers = array());
+    public function post($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make an HTTP PUT request to API
@@ -50,7 +49,7 @@ interface ClientInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function put($endpoint, $params = array(), $headers = array());
+    public function put($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make a HTTP DELETE request to API
@@ -61,7 +60,7 @@ interface ClientInterface
      * @param  array            $headers  HTTP headers
      * @return MessageInterface
      */
-    public function delete($endpoint, $params = array(), $headers = array());
+    public function delete($endpoint, $params = array(), array $headers = array());
 
     /**
      * Make a HTTP request
@@ -90,44 +89,11 @@ interface ClientInterface
      *
      * @access public
      * @param  string $format
-     * @return string
+     * @return $this
      *
      * @throws \InvalidArgumentException If invalid response format is provided
      */
     public function setResponseFormat($format);
-
-    /**
-     * @access public
-     * @param  ListenerInterface $listener
-     * @return $this
-     */
-    public function addListener(ListenerInterface $listener);
-
-    /**
-     * @access public
-     * @param  ListenerInterface|string $name
-     * @return $this
-     */
-    public function delListener($name);
-
-    /**
-     * Get listener interface
-     *
-     * @param  string            $name
-     * @return ListenerInterface
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function getListener($name);
-
-    /**
-     * Check if a listener exists
-     *
-     * @access public
-     * @param  string $name
-     * @return bool
-     */
-    public function isListener($name);
 
     /**
      * @access public

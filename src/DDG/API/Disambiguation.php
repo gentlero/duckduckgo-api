@@ -21,10 +21,11 @@ class Disambiguation extends Api
     /**
      * @access public
      * @param  string           $query
+     * @param  array            $params
      * @return MessageInterface
      */
-    public function get($query)
+    public function get($query, array $params = array())
     {
-        return $this->getClient()->get('/', array('q' => $query));
+        return $this->getClient()->get('/', array_merge(array('q' => $query), $params));
     }
 }
