@@ -3,6 +3,7 @@
 namespace DDG\Tests\API\Http;
 
 use Buzz\Message\Request;
+use DDG\API\Http\Listener\JsonBodyListener;
 use DDG\Tests\API\TestCase;
 use DDG\API\Http\Client;
 
@@ -121,6 +122,21 @@ class ClientTest extends TestCase
 
         $this->assertEquals('yes', $request->getHeader('X-Test'));
         $this->assertInstanceOf('\Buzz\Message\Response', $response);
+    }
+
+    public function testSetListenersWorksWithMultipleListeners()
+    {
+        $listeners = array(
+            '0' => array(
+                new JsonBodyListener()
+            )
+        );
+
+        $this->client->setListeners($listeners);
+
+        $listeners = $this->client->getListeners();
+
+        $this->assertArrayHasKey('json_body', $listeners[0]);
     }
 
     private function getListenerMock($name = 'dummy')
