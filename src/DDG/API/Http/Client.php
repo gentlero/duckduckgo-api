@@ -31,7 +31,7 @@ class Client extends ClientListener implements ClientInterface
         'base_url'      => 'https://api.duckduckgo.com',
         'format'        => 'json',
         'formats'       => array('json', 'xml'),    // supported response formats
-        'user_agent'    => 'duckduckgo-api-php/0.1.0 (https://github.com/gentlero/duckduckgo-api)',
+        'user_agent'    => 'duckduckgo-api-php/0.2.0 (https://github.com/gentlero/duckduckgo-api)',
         'app_name'      => 'my app',
         'timeout'       => 10,
         'verify_peer'   => true
