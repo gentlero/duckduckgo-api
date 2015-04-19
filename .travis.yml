@@ -11,8 +11,6 @@ matrix:
   fast_finish: true
   allow_failures:
     - php: 5.3
-    - php: hhvm
-    - php: nightly
 
 before_script:
   - curl -s http://getcomposer.org/installer | php
@@ -20,6 +18,6 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/phpunit -c phpunit.xml.dist
+  - php vendor/bin/phpunit
 
 after_script:
