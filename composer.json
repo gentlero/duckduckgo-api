@@ -21,7 +21,6 @@
     "require-dev": {
         "ext-curl":         "*",
         "ext-mbstring":     "*",
-        "ext-openssl":      "*",
         "phpunit/phpunit":  "~3.7"
     },
     "suggest": {
