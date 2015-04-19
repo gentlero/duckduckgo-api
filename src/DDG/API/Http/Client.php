@@ -34,7 +34,7 @@ class Client extends ClientListener implements ClientInterface
         'user_agent'    => 'duckduckgo-api-php/0.1.0 (https://github.com/gentlero/duckduckgo-api)',
         'app_name'      => 'my app',
         'timeout'       => 10,
-        'verify_peer'   => true,
+        'verify_peer'   => true
     );
 
     /**
@@ -149,7 +149,7 @@ class Client extends ClientListener implements ClientInterface
      */
     public function setResponseFormat($format)
     {
-        if (!in_array($format, $this->options['formats'])) {
+        if (!in_array($format, $this->options['formats'], true)) {
             throw new \InvalidArgumentException(sprintf('Unsupported response format %s', $format));
         }
 
@@ -219,7 +219,7 @@ class Client extends ClientListener implements ClientInterface
      */
     public function getOption($name)
     {
-        return isset($this->options[$name]) ? $this->options[$name] : null;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
     }
 
     /**
@@ -238,7 +238,7 @@ class Client extends ClientListener implements ClientInterface
         $request = is_object($this->requestObj) ? $this->requestObj : new Request();
         $request->setMethod($method);
         $request->addHeaders(array(
-                'User-Agent' => $this->options['user_agent'],
+                'User-Agent' => $this->options['user_agent']
             ));
         $request->setProtocolVersion(1.1);
         $request->fromUrl($url);
@@ -259,11 +259,11 @@ class Client extends ClientListener implements ClientInterface
     protected function setRequestData($params, $method, array $headers, RequestInterface $request)
     {
         // add a default content-type if none was set
-        if (in_array(strtoupper($method), array('POST', 'PUT')) && empty($headers['Content-Type'])) {
+        if (in_array(strtoupper($method), array('POST', 'PUT'), true) && empty($headers['Content-Type'])) {
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
-        if (!empty($headers)) {
+        if (count($headers) > 0) {
             $request->addHeaders($headers);
         }
 
@@ -299,11 +299,11 @@ class Client extends ClientListener implements ClientInterface
          * Add app name if was not already been set
          * @see https://duck.co/help/privacy/t
          */
-        if (!isset($params['t'])) {
+        if (!array_key_exists('t', $params)) {
             $params['t'] = $this->getOption('app_name');
         }
 
-        if (!isset($params['format'])) {
+        if (!array_key_exists('format', $params)) {
             $params['format'] = $this->getResponseFormat();
         }
 
@@ -316,9 +316,10 @@ class Client extends ClientListener implements ClientInterface
      * $when can be: preSend or postSend
      *
      * @access protected
-     * @param RequestInterface $request
-     * @param string           $when     When to execute the listener
-     * @param MessageInterface $response
+     * @param  RequestInterface $request
+     * @param  string           $when     When to execute the listener
+     * @param  MessageInterface $response
+     * @return void
      */
     protected function executeListeners(RequestInterface $request, $when = 'preSend', MessageInterface $response = null)
     {
