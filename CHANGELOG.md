@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   - Bug fix: `Http\Client::delListener()` now actually deletes the listener
 
 ### Changed:
+  - Better docs available at http://gentlero.github.io/duckduckgo-api/
   - Added helper methods for setting/getting application name.
   - Added possibility to set extra parameters for each endpoint.
   - Simplified ClientInterface.
